@@ -29,13 +29,13 @@ Specifically, the app shows the number of disease cases and the population in a 
 The app allows the user to upload a csv file with the data and a shapefile with the map of the region.
 The app also permits selecting the variable and the time to be shown.
 
-We develop the app using the R package `Shiny` (https://shiny.rstudio.com/).
+We develop the app using the R package [`Shiny`](https://shiny.rstudio.com/).
 The interactive data visualizations are built using the packages
-`DT` (https://rstudio.github.io/DT/),
-`dygraphs` (https://rstudio.github.io/dygraphs/), and
-`leaflet` (https://rstudio.github.io/leaflet/).
+[`DT`](https://rstudio.github.io/DT/),
+[`dygraphs`](https://rstudio.github.io/dygraphs/), and
+[`leaflet`](https://rstudio.github.io/leaflet/).
 The example we use refers to data of the number of lung cancer cases and population in the 88 counties of Ohio, United States, during years 1968 to 1988.
-These data are in the package `SpatialEpiApp` (https://paula-moraga.github.io/software/) and can also be downloaded from XX.
+These data are in the package [`SpatialEpiApp`](https://paula-moraga.github.io/software/) and can also be downloaded from [here](https://paula-moraga.github.io/teaching/).
 
 
 ```{r,  out.width = "100%", echo = FALSE, warning = FALSE}
@@ -47,7 +47,7 @@ include_graphics('./appdir/appfinalcaptura.png')
 
 # Shiny
 
-Shiny is a web application framework for R that enables to build interactive web applications (https://shiny.rstudio.com/).
+[`Shiny`](https://shiny.rstudio.com/) is a web application framework for R that enables to build interactive web applications.
 A Shiny app is a directory that contains an R file called `app.R` with three components:
 
 - a user interface object (`ui`) which controls the layout and appearance of the app,
@@ -89,7 +89,7 @@ Then, the app can be launched by typing `runApp("appdir_path")` where `appdir_pa
 
 # Setup
 
-We download the folder `appdir` from https://paula-moraga.github.io/software/ and save it in our computer. This folder contains the following subfolders:
+We download the folder `appdir` from [here](https://paula-moraga.github.io/teaching/) and save it in our computer. This folder contains the following subfolders:
 
 - `data` which contains a file called `data.csv` with the data, and a folder called `fe_2007_39_county` with the shapefile of Ohio,
 - `www` with the image `imageShiny.png`.
@@ -231,7 +231,7 @@ For example, to add a plot, we write in the `ui` `plotOutput()` and in `server()
 
 
 Here we include three outputs for interactive visualization.
-These are HTML widgets created with JavaScript libraries and embedded in Shiny by using the `htmlwidgets` package (https://www.htmlwidgets.org/).
+These are HTML widgets created with JavaScript libraries and embedded in Shiny by using the [`htmlwidgets`](https://www.htmlwidgets.org/) package.
 The outputs are created using the following packages:
 
 - `DT` to display the data in an interactive table,
@@ -359,8 +359,7 @@ map@data <- datafiltered[ordercounties, ]
 ```
 
 
-We create the leaflet map following the instructions in
-http://rstudio.github.io/leaflet/choropleths.html.
+We create the leaflet map following the instructions [here](http://rstudio.github.io/leaflet/choropleths.html).
 We use the `leaflet()` function, create a colour palette with `colorBin()`, and add a legend with `addLegend()`.
 For now we choose to plot the values of variable `cases`.
 We also add labels with the area names and values that are displayed when mouse is over the map.
@@ -502,7 +501,7 @@ output$map <- renderLeaflet({
     
 ```
 
-Note that a better way to modify an existing leaflet map is using the `leafletProxy()` function. Details on how to use this function are given in https://rstudio.github.io/leaflet/shiny.html.
+Note that a better way to modify an existing leaflet map is using the `leafletProxy()` function. Details on how to use this function are given [here](https://rstudio.github.io/leaflet/shiny.html).
 
 
 # Content of `app.R`
@@ -673,7 +672,7 @@ We do this by using inside the reactive expression the function `req(input$input
 `req()` evaluates its arguments one at a time and if these are missing it stops.
 In this way, the value returned by the reactive expression will not be updated, and
 outputs that use the value returned by the reactive expression will not be re-executed.
-Details on how to use `req()` are in https://shiny.rstudio.com/articles/req.html.
+Details on how to use `req()` are [here](https://shiny.rstudio.com/articles/req.html).
 
 We add `req(input$filedata)` at the beginning of the reactive expression that reads the data.
 If the data has not been uploaded yet, `input$filedata` is equal to `""`. This makes the execution of the reactive expression stop, `data()` is not updated, and the output depending on `data()` is not executed. 
