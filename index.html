@@ -277,11 +277,11 @@ Paula Moraga
 
 
 <p>In this tutorial we develop a Shiny web application to visualize spatial and spatio-temporal data. Specifically, the app shows the number of disease cases and the population in a given region using interactive maps, tables, and time series plots. The app allows the user to upload a csv file with the data and a shapefile with the map of the region. The app also permits selecting the variable and the time to be shown.</p>
-<p>We develop the app using the R package <code>Shiny</code> (<a href="https://shiny.rstudio.com/" class="uri">https://shiny.rstudio.com/</a>). The interactive data visualizations are built using the packages <code>DT</code> (<a href="https://rstudio.github.io/DT/" class="uri">https://rstudio.github.io/DT/</a>), <code>dygraphs</code> (<a href="https://rstudio.github.io/dygraphs/" class="uri">https://rstudio.github.io/dygraphs/</a>), and <code>leaflet</code> (<a href="https://rstudio.github.io/leaflet/" class="uri">https://rstudio.github.io/leaflet/</a>). The example we use refers to data of the number of lung cancer cases and population in the 88 counties of Ohio, United States, during years 1968 to 1988. These data are in the package <code>SpatialEpiApp</code> (<a href="https://paula-moraga.github.io/software/" class="uri">https://paula-moraga.github.io/software/</a>) and can also be downloaded from XX.</p>
+<p>We develop the app using the R package <a href="https://shiny.rstudio.com/"><code>Shiny</code></a>. The interactive data visualizations are built using the packages <a href="https://rstudio.github.io/DT/"><code>DT</code></a>, <a href="https://rstudio.github.io/dygraphs/"><code>dygraphs</code></a>, and <a href="https://rstudio.github.io/leaflet/"><code>leaflet</code></a>. The example we use refers to data of the number of lung cancer cases and population in the 88 counties of Ohio, United States, during years 1968 to 1988. These data are in the package <a href="https://paula-moraga.github.io/software/"><code>SpatialEpiApp</code></a> and can also be downloaded from <a href="https://paula-moraga.github.io/teaching/">here</a>.</p>
 <p><img src="appdir/appfinalcaptura.png" width="100%" /></p>
 <div id="section-shiny" class="section level1">
 <h1><span class="header-section-number">1</span> Shiny</h1>
-<p>Shiny is a web application framework for R that enables to build interactive web applications (<a href="https://shiny.rstudio.com/" class="uri">https://shiny.rstudio.com/</a>). A Shiny app is a directory that contains an R file called <code>app.R</code> with three components:</p>
+<p><a href="https://shiny.rstudio.com/"><code>Shiny</code></a> is a web application framework for R that enables to build interactive web applications. A Shiny app is a directory that contains an R file called <code>app.R</code> with three components:</p>
 <ul>
 <li>a user interface object (<code>ui</code>) which controls the layout and appearance of the app,</li>
 <li>a <code>server()</code> function with the instructions to build the objects displayed in the <code>ui</code>,</li>
@@ -313,7 +313,7 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 </div>
 <div id="section-setup" class="section level1">
 <h1><span class="header-section-number">2</span> Setup</h1>
-<p>We download the folder <code>appdir</code> from <a href="https://paula-moraga.github.io/software/" class="uri">https://paula-moraga.github.io/software/</a> and save it in our computer. This folder contains the following subfolders:</p>
+<p>We download the folder <code>appdir</code> from <a href="https://paula-moraga.github.io/teaching/">here</a> and save it in our computer. This folder contains the following subfolders:</p>
 <ul>
 <li><code>data</code> which contains a file called <code>data.csv</code> with the data, and a folder called <code>fe_2007_39_county</code> with the shapefile of Ohio,</li>
 <li><code>www</code> with the image <code>imageShiny.png</code>.</li>
@@ -408,7 +408,7 @@ map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="s
 <h1><span class="header-section-number">8</span> Add outputs</h1>
 <p>The <code>server()</code> function has the arguments <code>input</code> and <code>output</code>. <code>input</code> is a list-like object that stores the current values of the objects in the app. <code>output</code> is a list-like object that stores instructions for building the R objects in the app. Each element of <code>output</code> contains the output of a <code>render*()</code> function.</p>
 <p>We show the data using several outputs. Outputs are added in the app by including in <code>ui</code> an <code>*Output()</code> function for the output, and adding in <code>server()</code> a <code>render*()</code> function to the <code>output</code> that specifies how to build the object. For example, to add a plot, we write in the <code>ui</code> <code>plotOutput()</code> and in <code>server()</code> <code>renderPlot()</code>.</p>
-<p>Here we include three outputs for interactive visualization. These are HTML widgets created with JavaScript libraries and embedded in Shiny by using the <code>htmlwidgets</code> package (<a href="https://www.htmlwidgets.org/" class="uri">https://www.htmlwidgets.org/</a>). The outputs are created using the following packages:</p>
+<p>Here we include three outputs for interactive visualization. These are HTML widgets created with JavaScript libraries and embedded in Shiny by using the <a href="https://www.htmlwidgets.org/"><code>htmlwidgets</code></a> package. The outputs are created using the following packages:</p>
 <ul>
 <li><code>DT</code> to display the data in an interactive table,</li>
 <li><code>dygraphs</code> to display time series data,</li>
@@ -487,7 +487,7 @@ output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span cla
 <span class="co"># this returns positions of `map@data$NAME` in `datafiltered$county`</span>
 ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
 map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]</code></pre></div>
-<p>We create the leaflet map following the instructions in <a href="http://rstudio.github.io/leaflet/choropleths.html" class="uri">http://rstudio.github.io/leaflet/choropleths.html</a>. We use the <code>leaflet()</code> function, create a colour palette with <code>colorBin()</code>, and add a legend with <code>addLegend()</code>. For now we choose to plot the values of variable <code>cases</code>. We also add labels with the area names and values that are displayed when mouse is over the map.</p>
+<p>We create the leaflet map following the instructions <a href="http://rstudio.github.io/leaflet/choropleths.html">here</a>. We use the <code>leaflet()</code> function, create a colour palette with <code>colorBin()</code>, and add a legend with <code>addLegend()</code>. For now we choose to plot the values of variable <code>cases</code>. We also add labels with the area names and values that are displayed when mouse is over the map.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(leaflet)
 
 <span class="co"># in ui</span>
@@ -650,7 +650,7 @@ output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span cla
     <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
 <span class="st">    </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>variableplot, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>) <span class="co"># CHANGE cases by variableplot</span>
 })</code></pre></div>
-<p>Note that a better way to modify an existing leaflet map is using the <code>leafletProxy()</code> function. Details on how to use this function are given in <a href="https://rstudio.github.io/leaflet/shiny.html" class="uri">https://rstudio.github.io/leaflet/shiny.html</a>.</p>
+<p>Note that a better way to modify an existing leaflet map is using the <code>leafletProxy()</code> function. Details on how to use this function are given <a href="https://rstudio.github.io/leaflet/shiny.html">here</a>.</p>
 </div>
 </div>
 <div id="section-content-of-app.r-2" class="section level1">
@@ -945,7 +945,7 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 <h1><span class="header-section-number">14</span> Handle missing inputs</h1>
 <div id="section-require-input-files-to-be-available-using-req" class="section level2">
 <h2><span class="header-section-number">14.1</span> Require input files to be available using <code>req()</code></h2>
-<p>We note that until the user upload the files the outputs render error messages. Here we add code that makes the output not to be shown until the data is uploaded. We do this by using inside the reactive expression the function <code>req(input$inputId)</code> that means require <code>input$inputId</code> to be available. <code>req()</code> evaluates its arguments one at a time and if these are missing it stops. In this way, the value returned by the reactive expression will not be updated, and outputs that use the value returned by the reactive expression will not be re-executed. Details on how to use <code>req()</code> are in <a href="https://shiny.rstudio.com/articles/req.html" class="uri">https://shiny.rstudio.com/articles/req.html</a>.</p>
+<p>We note that until the user upload the files the outputs render error messages. Here we add code that makes the output not to be shown until the data is uploaded. We do this by using inside the reactive expression the function <code>req(input$inputId)</code> that means require <code>input$inputId</code> to be available. <code>req()</code> evaluates its arguments one at a time and if these are missing it stops. In this way, the value returned by the reactive expression will not be updated, and outputs that use the value returned by the reactive expression will not be re-executed. Details on how to use <code>req()</code> are <a href="https://shiny.rstudio.com/articles/req.html">here</a>.</p>
 <p>We add <code>req(input$filedata)</code> at the beginning of the reactive expression that reads the data. If the data has not been uploaded yet, <code>input$filedata</code> is equal to <code>&quot;&quot;</code>. This makes the execution of the reactive expression stop, <code>data()</code> is not updated, and the output depending on <code>data()</code> is not executed.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui. First line in the reactive() that reads the data</span>
 <span class="kw">req</span>(input<span class="op">$</span>filedata)</code></pre></div>
