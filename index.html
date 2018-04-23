@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<meta name="date" content="2018-04-23" />
+
+<title>Building a Shiny web application to visualize spatial and spatio-temporal data</title>
+
+<script src="index_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="index_files/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="index_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="index_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="index_files/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="index_files/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="index_files/navigation-1.1/tabsets.js"></script>
+<script src="index_files/navigation-1.1/codefolding.js"></script>
+<link href="index_files/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="index_files/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="index_files/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code > span.dt { color: #204a87; } /* DataType */
+code > span.dv { color: #0000cf; } /* DecVal */
+code > span.bn { color: #0000cf; } /* BaseN */
+code > span.fl { color: #0000cf; } /* Float */
+code > span.ch { color: #4e9a06; } /* Char */
+code > span.st { color: #4e9a06; } /* String */
+code > span.co { color: #8f5902; font-style: italic; } /* Comment */
+code > span.ot { color: #8f5902; } /* Other */
+code > span.al { color: #ef2929; } /* Alert */
+code > span.fu { color: #000000; } /* Function */
+code > span.er { color: #a40000; font-weight: bold; } /* Error */
+code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #000000; } /* SpecialChar */
+code > span.vs { color: #4e9a06; } /* VerbatimString */
+code > span.ss { color: #4e9a06; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #000000; } /* Variable */
+code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code > span.ex { } /* Extension */
+code > span.at { color: #c4a000; } /* Attribute */
+code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+div.sourceCode {
+  overflow-x: visible;
+}
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("section-TOC");
+});
+</script>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#section-TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#section-TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#section-TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="section-TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="section-header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Building a Shiny web application to visualize spatial and spatio-temporal data</h1>
+<h4 class="author"><em><a href="https://paula-moraga.github.io/">
+<h3>
+Paula Moraga
+</h3>
+<p></a> CHICAS, Lancaster University, UK</p></em></h4>
+<h4 class="date"><em>23 April 2018</em></h4>
+
+</div>
+
+
+<p>In this tutorial we develop a Shiny web application to visualize spatial and spatio-temporal data. Specifically, the app shows the number of disease cases and the population in a given region using interactive maps, tables, and time series plots. The app allows the user to upload a csv file with the data and a shapefile with the map of the region. The app also permits selecting the variable and the time to be shown.</p>
+<p>We develop the app using the R package <code>Shiny</code> (<a href="https://shiny.rstudio.com/" class="uri">https://shiny.rstudio.com/</a>). The interactive data visualizations are built using the packages <code>DT</code> (<a href="https://rstudio.github.io/DT/" class="uri">https://rstudio.github.io/DT/</a>), <code>dygraphs</code> (<a href="https://rstudio.github.io/dygraphs/" class="uri">https://rstudio.github.io/dygraphs/</a>), and <code>leaflet</code> (<a href="https://rstudio.github.io/leaflet/" class="uri">https://rstudio.github.io/leaflet/</a>). The example we use refers to data of the number of lung cancer cases and population in the 88 counties of Ohio, United States, during years 1968 to 1988. These data are in the package <code>SpatialEpiApp</code> (<a href="https://paula-moraga.github.io/software/" class="uri">https://paula-moraga.github.io/software/</a>) and can also be downloaded from XX.</p>
+<p><img src="appdir/appfinalcaptura.png" width="100%" /></p>
+<div id="section-shiny" class="section level1">
+<h1><span class="header-section-number">1</span> Shiny</h1>
+<p>Shiny is a web application framework for R that enables to build interactive web applications (<a href="https://shiny.rstudio.com/" class="uri">https://shiny.rstudio.com/</a>). A Shiny app is a directory that contains an R file called <code>app.R</code> with three components:</p>
+<ul>
+<li>a user interface object (<code>ui</code>) which controls the layout and appearance of the app,</li>
+<li>a <code>server()</code> function with the instructions to build the objects displayed in the <code>ui</code>,</li>
+<li>a call to <code>shinyApp()</code> that creates the Shiny app from the <code>ui</code>/<code>server</code> pair.</li>
+</ul>
+<p>Shiny apps contain input and output objects. Inputs permit users interact with the app by modifying their values. Outputs are objects that are shown in the app. Outputs are reactive if they are built using input values.</p>
+<p>The content of <code>app.R</code> is as follows.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load the shiny package</span>
+<span class="kw">library</span>(shiny)
+
+<span class="co"># define user interface object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="op">*</span><span class="kw">Input</span>(<span class="dt">inputId =</span> myinput, <span class="dt">label =</span> mylabel, ...)
+  <span class="op">*</span><span class="kw">Output</span>(<span class="dt">outputId =</span> myoutput, ...)
+)
+
+<span class="co"># define server() function</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){
+  output<span class="op">$</span>myoutput &lt;-<span class="st"> </span>render<span class="op">*</span>({
+    <span class="co"># code to build the output.</span>
+    <span class="co"># If it uses an input value (input$myinput),</span>
+    <span class="co"># the output will be rebuilt whenever</span>
+    <span class="co"># the input value changes</span>
+  })}
+
+<span class="co"># call to shinyApp() which returns the Shiny app</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p>The <code>app.R</code> file is saved inside a directory called <code>appdir</code>. Then, the app can be launched by typing <code>runApp(&quot;appdir_path&quot;)</code> where <code>appdir_path</code> is the path of the directory that contains <code>app.R</code>.</p>
+</div>
+<div id="section-setup" class="section level1">
+<h1><span class="header-section-number">2</span> Setup</h1>
+<p>We download the folder <code>appdir</code> from <a href="https://paula-moraga.github.io/software/" class="uri">https://paula-moraga.github.io/software/</a> and save it in our computer. This folder contains the following subfolders:</p>
+<ul>
+<li><code>data</code> which contains a file called <code>data.csv</code> with the data, and a folder called <code>fe_2007_39_county</code> with the shapefile of Ohio,</li>
+<li><code>www</code> with the image <code>imageShiny.png</code>.</li>
+</ul>
+</div>
+<div id="section-structure-of-app.r" class="section level1">
+<h1><span class="header-section-number">3</span> Structure of app.R</h1>
+<p>We start by writing a file called <code>app.R</code> with the minimum code needed to create a Shiny app.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+
+<span class="co"># ui object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>( )
+
+<span class="co"># server()</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){ }
+
+<span class="co"># shinyApp()</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p>We save this file with name <code>app.R</code> inside the directory called <code>appdir</code>. Then, we can launch the app by typing clicking the Run App button at the top of the RStudio editor, or by executing <code>runApp(&quot;appdir_path&quot;)</code> where <code>appdir_path</code> is the path of the directory that contains <code>app.R</code>.</p>
+<p>The resulting app has a blank user interface. In the following sections we include the objects and functionality we want to have in the app.</p>
+</div>
+<div id="section-layout" class="section level1">
+<h1><span class="header-section-number">4</span> Layout</h1>
+<p>We build a user interface with a sidebar layout. This layout includes a title panel, a sidebar panel for inputs on the left and a main panel for outputs on the right. The elements of the user interface are placed within the <code>fluidPage()</code> function and this permits the app to be automatically adjust to the dimensions of the browser window.</p>
+<p>The title of the app is added with <code>titlePanel()</code>. Then we write <code>sidebarLayout()</code> to create a sidebar layout with input and output definitions. <code>sidebarLayout()</code> takes the arguments <code>sidebarPanel()</code> and <code>mainPanel()</code>. <code>sidebarPanel()</code> creates a a sidebar panel for inputs on the left. <code>mainPanel()</code> creates a main panel for displaying outputs on the right.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">titlePanel</span>(<span class="st">&quot;title&quot;</span>),
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(<span class="st">&quot;sidebar panel for inputs&quot;</span>),
+    <span class="kw">mainPanel</span>(<span class="st">&quot;main panel for outputs&quot;</span>)
+  )
+)</code></pre></div>
+<p>We can add content to the app by passing it as an argument to <code>titlePanel()</code>, <code>sidebarPanel()</code>, or <code>mainPanel()</code>. Here we have added texts with the description of the panels.</p>
+<p>Note that to include multiple elements in the same panel they need to be separated with a comma.</p>
+</div>
+<div id="section-html-content" class="section level1">
+<h1><span class="header-section-number">5</span> HTML content</h1>
+<p>Now we add content to the app.</p>
+<div id="section-add-title" class="section level2">
+<h2><span class="header-section-number">5.1</span> Add title</h2>
+<p>First we add the title “Spatial app” to <code>titlePanel()</code>. We want to show this title in blue so we use <code>p()</code> to create a paragraph with text and set the style to #3474A7 color.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),</code></pre></div>
+</div>
+<div id="section-add-image" class="section level2">
+<h2><span class="header-section-number">5.2</span> Add image</h2>
+<p>Now we add an image with the <code>img()</code> function. The images that we wish to include in the app must be in a folder named <code>www</code> in the same directory as the <code>app.R</code> file. We use an image called <code>imageShiny.png</code> and put it in the <code>sidebarPanel()</code> using the following instruction.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sidebarPanel</span>(<span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)),</code></pre></div>
+<p>Here <code>src</code> denotes the source of the image, and <code>height</code> and <code>width</code> are the image height and width in pixels, respectively.</p>
+</div>
+<div id="section-add-website-link" class="section level2">
+<h2><span class="header-section-number">5.3</span> Add website link</h2>
+<p>We also add a text with a link referencing the Shiny website.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),</code></pre></div>
+<p>Note that in <code>sidebarPanel()</code> we need to write the function to generate the website link and the function to include the image separated with a comma.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sidebarPanel</span>(
+<span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),
+<span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)),</code></pre></div>
+</div>
+</div>
+<div id="section-content-of-app.r" class="section level1">
+<h1><span class="header-section-number">6</span> Content of <code>app.R</code></h1>
+<p>This is the content of <code>app.R</code> we have until now.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)</code></pre></div>
+<pre><code>## Warning: package &#39;shiny&#39; was built under R version 3.4.4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ui object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),
+      <span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)),
+    <span class="kw">mainPanel</span>(<span class="st">&quot;main panel for outputs&quot;</span>)
+  )
+)
+
+<span class="co"># server()</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){ }
+
+<span class="co"># shinyApp()</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p><img src="appdir/app1.png" width="100%" /></p>
+</div>
+<div id="section-read-data" class="section level1">
+<h1><span class="header-section-number">7</span> Read data</h1>
+<p>Now we read the data we want to show in the app. The data is in the folder called <code>data</code> in the <code>appdir</code> directory. We load the <code>rgdal</code> package, read the data <code>data.csv</code>, and read the shapefile of Ohio which is in the folder <code>fe_2007_39_county</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rgdal)
+data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/data.csv&quot;</span>)
+map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="st">&quot;data/fe_2007_39_county/fe_2007_39_county.shp&quot;</span>)</code></pre></div>
+<p>We only need to read the data once so we write this code at the beginning of <code>app.R</code> outside the <code>server()</code> function. By doing this, the code is not unnecessarily run more than once and the performance of the app is not decreased.</p>
+</div>
+<div id="section-add-outputs" class="section level1">
+<h1><span class="header-section-number">8</span> Add outputs</h1>
+<p>The <code>server()</code> function has the arguments <code>input</code> and <code>output</code>. <code>input</code> is a list-like object that stores the current values of the objects in the app. <code>output</code> is a list-like object that stores instructions for building the R objects in the app. Each element of <code>output</code> contains the output of a <code>render*()</code> function.</p>
+<p>We show the data using several outputs. Outputs are added in the app by including in <code>ui</code> an <code>*Output()</code> function for the output, and adding in <code>server()</code> a <code>render*()</code> function to the <code>output</code> that specifies how to build the object. For example, to add a plot, we write in the <code>ui</code> <code>plotOutput()</code> and in <code>server()</code> <code>renderPlot()</code>.</p>
+<p>Here we include three outputs for interactive visualization. These are HTML widgets created with JavaScript libraries and embedded in Shiny by using the <code>htmlwidgets</code> package (<a href="https://www.htmlwidgets.org/" class="uri">https://www.htmlwidgets.org/</a>). The outputs are created using the following packages:</p>
+<ul>
+<li><code>DT</code> to display the data in an interactive table,</li>
+<li><code>dygraphs</code> to display time series data,</li>
+<li><code>leaflet</code> to create an interactive map.</li>
+</ul>
+<div id="section-table-using-dt" class="section level2">
+<h2><span class="header-section-number">8.1</span> Table using <code>DT</code></h2>
+<p><a href="https://rstudio.github.io/DT/shiny.html" class="uri">https://rstudio.github.io/DT/shiny.html</a></p>
+<p>We show the data stored in <code>data</code> with an interactive table using the <code>DT</code> package. In <code>ui</code> we use <code>DTOutput()</code>, and in <code>server()</code> we use <code>renderDT()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DT)
+
+<span class="co"># in ui</span>
+<span class="kw">DTOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;table&quot;</span>)
+
+<span class="co"># in server()</span>
+output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>(data)</code></pre></div>
+</div>
+<div id="section-time-series-plot-using-dygraphs" class="section level2">
+<h2><span class="header-section-number">8.2</span> Time series plot using <code>dygraphs</code></h2>
+<p><a href="http://rstudio.github.io/dygraphs" class="uri">http://rstudio.github.io/dygraphs</a></p>
+<p>We show the temporal trends of the data with the <code>dygraphs</code> package. In <code>ui</code> we use <code>dygraphOutput()</code>, and in <code>server()</code> we use <code>renderDygraph()</code>.</p>
+<p><code>dygraphs</code> plots an extensible time series object <code>xts</code>. We can create this type of object using the <code>xts()</code> function of the <code>xts</code> package specifying the values and the dates. The dates in <code>data</code> are the years of column <code>year</code>. For now we choose to plot the values of the variable <code>cases</code> of <code>data</code>.</p>
+<p>We need to construct a <code>xts</code> for each county and then put them together in <code>dataxts</code>. For each of the counties, we filter the data of the county and assign it to <code>datacounty</code>. Then we construct a <code>xts</code> object with values <code>datacounty$cases</code> and dates <code>as.Date(paste0(data$year, &quot;-01-01&quot;))</code>. Then we assign the name of the counties to each <code>xts</code> (<code>colnames(dataxts) &lt;- counties</code>) so county names can be shown in the legend.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+<span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+  datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l],]
+  dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, <span class="st">&quot;cases&quot;</span>], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year, <span class="st">&quot;-01-01&quot;</span>)))
+  dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+}
+<span class="kw">colnames</span>(dataxts) &lt;-<span class="st"> </span>counties</code></pre></div>
+<p>Finally we plot <code>dataxts</code> with <code>dygraph()</code> allowing for mouse-over highlighting.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>)</code></pre></div>
+<p>We customize the legend so only the name of the highlighted serie is shown. To do this, one option is writing a css file with the instructions and pass the css file to <code>dyCSS()</code>. Instead of that, we set the css directly in the code as shown <a href="https://gist.github.com/timelyportfolio/cf7b94048ffe7b6a0112">here</a>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>) -&gt;<span class="st"> </span>d1
+
+d1<span class="op">$</span>x<span class="op">$</span>css =<span class="st"> &quot;</span>
+<span class="st">.dygraph-legend &gt; span {display:none;}</span>
+<span class="st">.dygraph-legend &gt; span.highlight { display: inline; }</span>
+<span class="st">&quot;</span>
+d1</code></pre></div>
+<p>The complete code to build the <code>dygraphs</code> object is the following:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dygraphs)
+<span class="kw">library</span>(xts)
+
+<span class="co"># in ui</span>
+<span class="kw">dygraphOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;timetrend&quot;</span>)
+
+<span class="co"># in server()</span>
+output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+  
+  dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+  counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+  <span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+    datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l], ]
+    dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, <span class="st">&quot;cases&quot;</span>], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year, <span class="st">&quot;-01-01&quot;</span>)))
+    dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+  }
+  <span class="kw">colnames</span>(dataxts) &lt;-<span class="st"> </span>counties
+  
+  <span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>)-&gt;<span class="st"> </span>d1
+  
+  d1<span class="op">$</span>x<span class="op">$</span>css =<span class="st"> &quot;</span>
+<span class="st"> .dygraph-legend &gt; span {display:none;}</span>
+<span class="st"> .dygraph-legend &gt; span.highlight { display: inline; }</span>
+<span class="st"> &quot;</span>
+  d1
+})</code></pre></div>
+</div>
+<div id="section-map-using-leaflet" class="section level2">
+<h2><span class="header-section-number">8.3</span> Map using <code>leaflet</code></h2>
+<p><a href="http://rstudio.github.io/leaflet/" class="uri">http://rstudio.github.io/leaflet/</a></p>
+<p>We use the <code>leaflet</code> package to build an interactive map. In <code>ui</code> we use <code>leafletOutput()</code>, and in <code>server()</code> we use <code>renderLeaflet()</code>. Inside <code>renderLeaflet()</code> we write the instructions to return a leaflet map.</p>
+<p>First, we need to add the data to the shapefile so the values can be plotted in a map. For now we choose to plot the values of the variable in year 1980. We create a dataset <code>datafiltered</code> with the data corresponding to that year. Then we add <code>datafiltered</code> to <code>map@data</code> in an order such that the counties in the data match the counties in the map.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span><span class="dv">1980</span>), ]
+<span class="co"># this returns positions of `map@data$NAME` in `datafiltered$county`</span>
+ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]</code></pre></div>
+<p>We create the leaflet map following the instructions in <a href="http://rstudio.github.io/leaflet/choropleths.html" class="uri">http://rstudio.github.io/leaflet/choropleths.html</a>. We use the <code>leaflet()</code> function, create a colour palette with <code>colorBin()</code>, and add a legend with <code>addLegend()</code>. For now we choose to plot the values of variable <code>cases</code>. We also add labels with the area names and values that are displayed when mouse is over the map.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(leaflet)
+
+<span class="co"># in ui</span>
+<span class="kw">leafletOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;map&quot;</span>)
+
+<span class="co"># in server()</span>
+output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+  
+  <span class="co"># Add data to map</span>
+  datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span><span class="dv">1980</span>), ]
+  ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+  map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]
+  
+  <span class="co"># Create leaflet</span>
+  pal &lt;-<span class="st"> </span><span class="kw">colorBin</span>(<span class="st">&quot;YlOrRd&quot;</span>, <span class="dt">domain =</span> map<span class="op">$</span>cases, <span class="dt">bins =</span> <span class="dv">7</span>)
+  
+  labels &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;%s: %g&quot;</span>, map<span class="op">$</span>county, map<span class="op">$</span>cases) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(htmltools<span class="op">::</span>HTML)
+  
+  l &lt;-<span class="st"> </span><span class="kw">leaflet</span>(map) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addTiles</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addPolygons</span>(
+    <span class="dt">fillColor =</span> <span class="op">~</span><span class="kw">pal</span>(cases),
+    <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>,
+    <span class="dt">dashArray =</span> <span class="st">&quot;3&quot;</span>,
+    <span class="dt">fillOpacity =</span> <span class="fl">0.7</span>,
+    <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
+<span class="st">    </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>cases, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>)
+})</code></pre></div>
+</div>
+</div>
+<div id="section-content-of-app.r-1" class="section level1">
+<h1><span class="header-section-number">9</span> Content of <code>app.R</code></h1>
+<p>This is the content of <code>app.R</code> we have until now.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(rgdal)
+<span class="kw">library</span>(DT)
+<span class="kw">library</span>(dygraphs)
+<span class="kw">library</span>(xts)
+<span class="kw">library</span>(leaflet)
+
+data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/data.csv&quot;</span>)
+map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="st">&quot;data/fe_2007_39_county/fe_2007_39_county.shp&quot;</span>)
+
+<span class="co"># ui object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),
+      <span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)),
+    <span class="kw">mainPanel</span>(
+      <span class="kw">leafletOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;map&quot;</span>),
+      <span class="kw">dygraphOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;timetrend&quot;</span>),
+      <span class="kw">DTOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;table&quot;</span>)
+    )
+  )
+)
+
+<span class="co"># server()</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){
+  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>(data)
+  
+  output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+    
+    dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+    counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+    <span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+      datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l],]
+      dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, <span class="st">&quot;cases&quot;</span>], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year,<span class="st">&quot;-01-01&quot;</span>)))
+      dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+    }
+    <span class="kw">colnames</span>(dataxts) &lt;-<span class="st"> </span>counties
+    
+    <span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>)-&gt;<span class="st"> </span>d1
+    
+    d1<span class="op">$</span>x<span class="op">$</span>css =<span class="st"> &quot;</span>
+<span class="st"> .dygraph-legend &gt; span {display:none;}</span>
+<span class="st"> .dygraph-legend &gt; span.highlight { display: inline; }</span>
+<span class="st"> &quot;</span>
+    d1
+  })
+  
+  output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+    
+    <span class="co"># Add data to map</span>
+    datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span><span class="dv">1980</span>), ]
+    ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+    map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]
+    
+    <span class="co"># Create leaflet</span>
+    pal &lt;-<span class="st"> </span><span class="kw">colorBin</span>(<span class="st">&quot;YlOrRd&quot;</span>, <span class="dt">domain =</span> map<span class="op">$</span>cases, <span class="dt">bins =</span> <span class="dv">7</span>)
+    
+    labels &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;%s: %g&quot;</span>, map<span class="op">$</span>county, map<span class="op">$</span>cases) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(htmltools<span class="op">::</span>HTML)
+    
+    l &lt;-<span class="st"> </span><span class="kw">leaflet</span>(map) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addTiles</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addPolygons</span>(
+      <span class="dt">fillColor =</span> <span class="op">~</span><span class="kw">pal</span>(cases),
+      <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>,
+      <span class="dt">dashArray =</span> <span class="st">&quot;3&quot;</span>,
+      <span class="dt">fillOpacity =</span> <span class="fl">0.7</span>,
+      <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
+<span class="st">      </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>cases, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>)
+    <span class="co"># write leaflet::addLegend to avoid Error object &#39;.xts_chob&#39; not found</span>
+  })
+}
+
+<span class="co"># shinyApp()</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p><img src="appdir/app2.png" width="100%" /></p>
+</div>
+<div id="section-add-reactivity" class="section level1">
+<h1><span class="header-section-number">10</span> Add reactivity</h1>
+<p>Now we add functionality to enable users select a specific variable and year to be shown. In order to select a variable, we include an input of a menu containing the possible variables. Then the user can select the variable he or she wants to see, and this will rebuild the map and the time series plot.</p>
+<p>To add an input to a Shiny app, we need to place an input function <code>*Input()</code> in the <code>ui</code> object. Each input function requires several arguments. The first two are <code>inputId</code>, a name necessary to access the input’s value, and <code>label</code>, a label that appears in the app. We create the input menu with the possible variable choices using this code.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui</span>
+<span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;variableselected&quot;&quot;, label = &quot;</span>Select variable<span class="st">&quot;,</span>
+<span class="st">            choices = c(&quot;</span>cases<span class="st">&quot;, &quot;</span>population<span class="st">&quot;))</span></code></pre></div>
+<p>In this input, name is <code>&quot;variableselected&quot;</code>, label is <code>&quot;Select variable&quot;</code> and <code>choices</code> contains the variables to select from which are <code>&quot;cases&quot;</code> and <code>&quot;population&quot;</code>. The value of this input can be accessed with <code>input$variableselected</code>. We create reactivity by including the value of the input (<code>input$variableselected</code>) in the <code>render*()</code> expressions in <code>server()</code> that build the outputs. Thus, when we select a different variable in the menu, Shiny rebuilds all the outputs that depend on the input using the updated input value.</p>
+<p>Similarly, we add a menu with name <code>&quot;yearselected&quot;</code> with all possible years so we can select the year we want to see. The name of this input is <code>&quot;yearselected&quot;</code>. When we select a year, the input value <code>input$yearselected</code> changes and Shiny rebuilds all the outputs that depend on it using the new input value.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui</span>
+<span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;yearselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select year&quot;</span>,
+            <span class="dt">choices =</span> <span class="dv">1968</span><span class="op">:</span><span class="dv">1988</span>)</code></pre></div>
+<p>Now we need to modify the <code>dygraphs</code> time series plot and the <code>leaflet</code> map so that they are built with the input values <code>input$variableselected</code> and <code>input$yearselected</code>.</p>
+<div id="section-reactivity-in-dygraphs" class="section level2">
+<h2><span class="header-section-number">10.1</span> Reactivity in <code>dygraphs</code></h2>
+<p>We modify <code>renderDygraph()</code> by writing <code>datacounty[, input$variableselected]</code> instead of <code>datacounty$cases</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in server()</span>
+output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+  
+  dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+  counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+  <span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+    datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l], ]
+    dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, input<span class="op">$</span>variableselected], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year, <span class="st">&quot;-01-01&quot;</span>))) <span class="co"># CHANGE &quot;cases&quot; by input$variableselected</span>
+    dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+  }
+...
+})</code></pre></div>
+</div>
+<div id="section-reactivity-in-leaflet" class="section level2">
+<h2><span class="header-section-number">10.2</span> Reactivity in <code>leaflet</code></h2>
+<p>We also modify <code>renderLeaflet()</code> by selecting data corresponding to year <code>input$yearselected</code> and plot variable <code>input$variableselected</code> instead of variable <code>cases</code>. We create a new column in <code>map</code> called <code>variableplot</code> with the values of variable <code>input$variableselected</code> and plot the map with the values in <code>variableplot</code>. In <code>leaflet()</code> we modify <code>colorBin()</code>, <code>addPolygons()</code>, <code>addLegend()</code> and <code>labels</code> to show <code>variableplot</code> instead of variable <code>cases</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+  
+  <span class="co"># Add data to map</span>
+  datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>input<span class="op">$</span>yearselected), ] <span class="co"># CHANGE 1980 by input$yearselected</span>
+  ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+  map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]
+  
+  <span class="co"># Create variableplot</span>
+  map<span class="op">$</span>variableplot &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(map<span class="op">@</span>data[, input<span class="op">$</span>variableselected]) <span class="co"># ADD this to create variableplot</span>
+  
+  <span class="co"># Create leaflet</span>
+  pal &lt;-<span class="st"> </span><span class="kw">colorBin</span>(<span class="st">&quot;YlOrRd&quot;</span>, <span class="dt">domain =</span> map<span class="op">$</span>variableplot, <span class="dt">bins =</span> <span class="dv">7</span>) <span class="co"># CHANGE map$cases by map$variableplot</span>
+  
+  labels &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;%s: %g&quot;</span>, map<span class="op">$</span>county, map<span class="op">$</span>variableplot) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(htmltools<span class="op">::</span>HTML) <span class="co"># CHANGE map$cases by map$variableplot</span>
+  
+  l &lt;-<span class="st"> </span><span class="kw">leaflet</span>(map) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addTiles</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addPolygons</span>(
+    <span class="dt">fillColor =</span> <span class="op">~</span><span class="kw">pal</span>(variableplot), <span class="co"># CHANGE cases by variableplot</span>
+    <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>,
+    <span class="dt">dashArray =</span> <span class="st">&quot;3&quot;</span>,
+    <span class="dt">fillOpacity =</span> <span class="fl">0.7</span>,
+    <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
+<span class="st">    </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>variableplot, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>) <span class="co"># CHANGE cases by variableplot</span>
+})</code></pre></div>
+<p>Note that a better way to modify an existing leaflet map is using the <code>leafletProxy()</code> function. Details on how to use this function are given in <a href="https://rstudio.github.io/leaflet/shiny.html" class="uri">https://rstudio.github.io/leaflet/shiny.html</a>.</p>
+</div>
+</div>
+<div id="section-content-of-app.r-2" class="section level1">
+<h1><span class="header-section-number">11</span> Content of <code>app.R</code></h1>
+<p>The content of <code>app.R</code> is shown below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(rgdal)
+<span class="kw">library</span>(DT)
+<span class="kw">library</span>(dygraphs)
+<span class="kw">library</span>(xts)
+<span class="kw">library</span>(leaflet)
+
+data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/data.csv&quot;</span>)
+map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="st">&quot;data/fe_2007_39_county/fe_2007_39_county.shp&quot;</span>)
+
+<span class="co"># ui object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;variableselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select variable&quot;</span>,
+                  <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;cases&quot;</span>, <span class="st">&quot;population&quot;</span>)),
+      <span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;yearselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select year&quot;</span>,
+                  <span class="dt">choices =</span> <span class="dv">1968</span><span class="op">:</span><span class="dv">1988</span>),
+      
+      <span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),
+      <span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)
+    ),
+    
+    <span class="kw">mainPanel</span>(
+      <span class="kw">leafletOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;map&quot;</span>),
+      <span class="kw">dygraphOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;timetrend&quot;</span>),
+      <span class="kw">DTOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;table&quot;</span>)
+    )
+  )
+)
+
+<span class="co"># server()</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){
+  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>(data)
+  
+  output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+    
+    dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+    counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+    <span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+      datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l],]
+      dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, input<span class="op">$</span>variableselected], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year,<span class="st">&quot;-01-01&quot;</span>)))
+      dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+    }
+    <span class="kw">colnames</span>(dataxts) &lt;-<span class="st"> </span>counties
+    
+    <span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>)-&gt;<span class="st"> </span>d1
+    
+    d1<span class="op">$</span>x<span class="op">$</span>css =<span class="st"> &quot;</span>
+<span class="st"> .dygraph-legend &gt; span {display:none;}</span>
+<span class="st"> .dygraph-legend &gt; span.highlight { display: inline; }</span>
+<span class="st"> &quot;</span>
+    d1
+  })
+  
+  output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+    
+    <span class="co"># Add data to map</span>
+    datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>input<span class="op">$</span>yearselected), ] <span class="co"># CHANGE 1980 by input$yearselected</span>
+    ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+    map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]
+    
+    <span class="co"># Create variableplot</span>
+    map<span class="op">$</span>variableplot &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(map<span class="op">@</span>data[, input<span class="op">$</span>variableselected]) <span class="co"># ADD this to create variableplot</span>
+    
+    <span class="co"># Create leaflet</span>
+    pal &lt;-<span class="st"> </span><span class="kw">colorBin</span>(<span class="st">&quot;YlOrRd&quot;</span>, <span class="dt">domain =</span> map<span class="op">$</span>variableplot, <span class="dt">bins =</span> <span class="dv">7</span>) <span class="co"># CHANGE map$cases by map$variableplot</span>
+    
+    labels &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;%s: %g&quot;</span>, map<span class="op">$</span>county, map<span class="op">$</span>variableplot) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(htmltools<span class="op">::</span>HTML) <span class="co"># CHANGE map$cases by map$variableplot</span>
+    
+    l &lt;-<span class="st"> </span><span class="kw">leaflet</span>(map) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addTiles</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addPolygons</span>(
+      <span class="dt">fillColor =</span> <span class="op">~</span><span class="kw">pal</span>(variableplot), <span class="co"># CHANGE cases by variableplot</span>
+      <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>,
+      <span class="dt">dashArray =</span> <span class="st">&quot;3&quot;</span>,
+      <span class="dt">fillOpacity =</span> <span class="fl">0.7</span>,
+      <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
+<span class="st">      </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>variableplot, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>) <span class="co"># CHANGE cases by variableplot</span>
+  })
+}
+
+<span class="co"># shinyApp()</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p><img src="appdir/app3.png" width="100%" /></p>
+</div>
+<div id="section-upload-data" class="section level1">
+<h1><span class="header-section-number">12</span> Upload data</h1>
+<p>Instead of reading the data files at the beginning of the app, we may want to upload our own files. In order to do that, we delete the code we previously used to read the data, and add two inputs that enable to upload a csv file and a shapefile.</p>
+<div id="section-inputs-in-ui-to-upload-a-csv-file-and-a-shapefile" class="section level2">
+<h2><span class="header-section-number">12.1</span> Inputs in <code>ui</code> to upload a csv file and a shapefile</h2>
+<p>We create inputs to upload the data with the <code>fileInput()</code> function. <code>fileInput()</code> has a parameter called <code>multiple</code> that can be set to TRUE to allow the user to select multiple files. It also has a parameter called <code>accept</code> that can be set to a character vector with the type of files the input expects.</p>
+<p>Here we write two inputs. One of the inputs is to upload the data. This input has name <code>filedata</code> and the input value can be accessed with <code>input$filedata</code>. This input accepts <code>.csv</code> files.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui</span>
+<span class="kw">fileInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;filedata&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Upload data. Choose csv file&quot;</span>,
+          <span class="dt">accept =</span> <span class="kw">c</span>(<span class="st">&quot;.csv&quot;</span>)),</code></pre></div>
+<p>The other input is to upload the shapefile. This input has name <code>filemap</code> and the input value can be accessed with <code>input$filemap</code>. This input accepts multiple files of type <code>'.shp','.dbf','.sbn','.sbx','.shx',</code> and <code>'.prj'</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui</span>
+<span class="kw">fileInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;filemap&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Upload map. Choose shapefile&quot;</span>,
+          <span class="dt">multiple =</span> <span class="ot">TRUE</span>, <span class="dt">accept =</span> <span class="kw">c</span>(<span class="st">&#39;.shp&#39;</span>,<span class="st">&#39;.dbf&#39;</span>,<span class="st">&#39;.sbn&#39;</span>,<span class="st">&#39;.sbx&#39;</span>,<span class="st">&#39;.shx&#39;</span>,<span class="st">&#39;.prj&#39;</span>)),</code></pre></div>
+<p>Note that a shapefile consist of different files with extensions <code>.shp</code>, <code>.dbf</code>, <code>.shx</code> etc. When we are using the Shiny app and uploading the shapefile, we need to upload all these files at once. That is, we need to select all the files and then click upload. Selecting just the file with extension <code>.shp</code> does not upload the shapefile.</p>
+</div>
+<div id="section-upload-csv-file-in-server" class="section level2">
+<h2><span class="header-section-number">12.2</span> Upload csv file in <code>server()</code></h2>
+<p>We use the input values to read the csv file and the shapefile. We do this within a reactive expression. A reactive expression is an R expression that uses an input value and returns a value. To create a reactive expression we use the <code>reactive()</code> function, which takes an R expression surrounded by braces (<code>{}</code>). The reactive expression updates whenever the input value changes.</p>
+<p>For example, we read the data with <code>read.csv(input$filedata$datapath)</code> where <code>input$filedata$datapath</code> is the data path contained in the value of the input that uploads the data. We put <code>read.csv(input$filedata$datapath)</code> inside <code>reactive()</code>. In this way, each time <code>input$filedata$datapath</code> is updated, the reactive expression is re-executed. The output of the reactive expression is assigned to <code>data</code>. In <code>server()</code>, <code>data</code> can be accessed with <code>data()</code>. <code>data()</code> will be updated each time the reactive expression that builds is re-executed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in server()</span>
+data &lt;-<span class="st"> </span><span class="kw">reactive</span>({<span class="kw">read.csv</span>(input<span class="op">$</span>filedata<span class="op">$</span>datapath)})</code></pre></div>
+</div>
+<div id="section-upload-shapefile-in-server" class="section level2">
+<h2><span class="header-section-number">12.3</span> Upload shapefile in <code>server()</code></h2>
+<p>We also write a reactive expression to read the map. We assign the result of the reactive expression to <code>map</code>. In <code>server()</code>, we access the map with <code>map()</code>.</p>
+<p>To read the shapefile we use the <code>readOGR()</code> function of the <code>rgdal</code> package. When files are uploaded with <code>fileInput()</code> they have different names from the ones in the directory. We first rename files with the actual names and then read the shapefile with <code>readOGR()</code> passing the name of the file with <code>.shp</code> extension.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in server()</span>
+map &lt;-<span class="st"> </span><span class="kw">reactive</span>({
+  <span class="co"># shpdf is a data.frame with the name, size, type and datapath of the uploaded files</span>
+  shpdf &lt;-<span class="st"> </span>input<span class="op">$</span>filemap
+  
+  <span class="co"># The files are uploaded with names 0.dbf, 1.prj, 2.shp, 3.xml, 4.shx</span>
+  <span class="co"># (path/names are in column datapath)</span>
+  <span class="co"># We need to rename the files with the actual names: fe_2007_39_county.dbf, etc.</span>
+  <span class="co"># (these are in column name)</span>
+  
+  <span class="co"># Name of the temporary directory where files are uploaded</span>
+  tempdirname &lt;-<span class="st"> </span><span class="kw">dirname</span>(shpdf<span class="op">$</span>datapath[<span class="dv">1</span>])
+  
+  <span class="co"># Rename files</span>
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(shpdf)){
+    <span class="kw">file.rename</span>(shpdf<span class="op">$</span>datapath[i], <span class="kw">paste0</span>(tempdirname, <span class="st">&quot;/&quot;</span>, shpdf<span class="op">$</span>name[i]))
+  }
+  
+  <span class="co"># Now we read the shapefile with readOGR() of rgdal package</span>
+  <span class="co"># passing the name of the file with .shp extension.</span>
+
+  <span class="co"># We use the function grep() to search the pattern &quot;*.shp$&quot;</span>
+  <span class="co"># within each element of the character vector shpdf$name.</span>
+  <span class="co"># grep(pattern=&quot;*.shp$&quot;, shpdf$name)</span>
+  <span class="co"># ($ at the end denote files that finish with .shp, not only that contain .shp)</span>
+  map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="kw">paste</span>(tempdirname, shpdf<span class="op">$</span>name[<span class="kw">grep</span>(<span class="dt">pattern =</span> <span class="st">&quot;*.shp$&quot;</span>, shpdf<span class="op">$</span>name)], <span class="dt">sep =</span> <span class="st">&quot;/&quot;</span>))
+  map
+})</code></pre></div>
+</div>
+<div id="section-access-the-data-and-the-map" class="section level2">
+<h2><span class="header-section-number">12.4</span> Access the data and the map</h2>
+<p>To access the data and the map in <code>renderDT()</code>, <code>renderLeaflet()</code> and <code>renderDygraph()</code>, we use <code>map()</code> and <code>data()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#in server()</span>
+
+output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>(<span class="kw">data</span>())
+
+output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+map &lt;-<span class="st"> </span><span class="kw">map</span>()
+data &lt;-<span class="st"> </span><span class="kw">data</span>()
+...
+})
+    
+    
+output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+data &lt;-<span class="st"> </span><span class="kw">data</span>()
+...  
+})</code></pre></div>
+</div>
+</div>
+<div id="section-content-of-app.r-3" class="section level1">
+<h1><span class="header-section-number">13</span> Content of <code>app.R</code></h1>
+<p>The content of <code>app.R</code> is shown below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(rgdal)
+<span class="kw">library</span>(DT)
+<span class="kw">library</span>(dygraphs)
+<span class="kw">library</span>(xts)
+<span class="kw">library</span>(leaflet)
+
+<span class="co"># ui object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      
+      <span class="kw">fileInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;filedata&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Upload data. Choose csv file&quot;</span>,
+                <span class="dt">accept =</span> <span class="kw">c</span>(<span class="st">&quot;.csv&quot;</span>)),
+      <span class="kw">fileInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;filemap&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Upload map. Choose shapefile&quot;</span>,
+                <span class="dt">multiple =</span> <span class="ot">TRUE</span>, <span class="dt">accept =</span> <span class="kw">c</span>(<span class="st">&#39;.shp&#39;</span>,<span class="st">&#39;.dbf&#39;</span>,<span class="st">&#39;.sbn&#39;</span>,<span class="st">&#39;.sbx&#39;</span>,<span class="st">&#39;.shx&#39;</span>,<span class="st">&#39;.prj&#39;</span>)),
+      
+      <span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;variableselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select variable&quot;</span>,
+                  <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;cases&quot;</span>, <span class="st">&quot;population&quot;</span>)),
+      <span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;yearselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select year&quot;</span>,
+                  <span class="dt">choices =</span> <span class="dv">1968</span><span class="op">:</span><span class="dv">1988</span>),
+      
+      <span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),
+      <span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)
+    ),
+    
+    <span class="kw">mainPanel</span>(
+      <span class="kw">leafletOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;map&quot;</span>),
+      <span class="kw">dygraphOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;timetrend&quot;</span>),
+      <span class="kw">DTOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;table&quot;</span>)
+    )
+  )
+)
+
+<span class="co"># server()</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){
+  data &lt;-<span class="st"> </span><span class="kw">reactive</span>({<span class="kw">read.csv</span>(input<span class="op">$</span>filedata<span class="op">$</span>datapath)})
+  
+  map &lt;-<span class="st"> </span><span class="kw">reactive</span>({
+    <span class="co"># shpdf is a data.frame with the name, size, type and datapath of the uploaded files</span>
+    shpdf &lt;-<span class="st"> </span>input<span class="op">$</span>filemap
+    
+    <span class="co"># The files are uploaded with names 0.dbf, 1.prj, 2.shp, 3.xml, 4.shx</span>
+    <span class="co"># (path/names are in column datapath)</span>
+    <span class="co"># We need to rename the files with the actual names: fe_2007_39_county.dbf, etc.</span>
+    <span class="co"># (these are in column name)</span>
+    
+    <span class="co"># Name of the temporary directory where files are uploaded</span>
+    tempdirname &lt;-<span class="st"> </span><span class="kw">dirname</span>(shpdf<span class="op">$</span>datapath[<span class="dv">1</span>])
+    
+    <span class="co"># Rename files</span>
+    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(shpdf)){
+      <span class="kw">file.rename</span>(shpdf<span class="op">$</span>datapath[i], <span class="kw">paste0</span>(tempdirname, <span class="st">&quot;/&quot;</span>, shpdf<span class="op">$</span>name[i]))
+    }
+    
+    <span class="co"># Now we read the shapefile with readOGR() of rgdal package</span>
+    <span class="co"># passing the name of the file with .shp extension.</span>
+    
+    <span class="co"># We use the function grep() to search the pattern &quot;*.shp$&quot;</span>
+    <span class="co"># within each element of the character vector shpdf$name.</span>
+    <span class="co"># grep(pattern=&quot;*.shp$&quot;, shpdf$name)</span>
+    <span class="co"># ($ at the end denote files that finish with .shp, not only that contain .shp)</span>
+    map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="kw">paste</span>(tempdirname, shpdf<span class="op">$</span>name[<span class="kw">grep</span>(<span class="dt">pattern =</span> <span class="st">&quot;*.shp$&quot;</span>, shpdf<span class="op">$</span>name)], <span class="dt">sep =</span><span class="st">&quot;/&quot;</span>))
+    map
+  })
+  
+  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>(<span class="kw">data</span>())
+  
+  output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+    data &lt;-<span class="st"> </span><span class="kw">data</span>()
+    
+    dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+    counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+    <span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+      datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l],]
+      dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, input<span class="op">$</span>variableselected], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year,<span class="st">&quot;-01-01&quot;</span>)))
+      dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+    }
+    <span class="kw">colnames</span>(dataxts) &lt;-<span class="st"> </span>counties
+    
+    <span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>)-&gt;<span class="st"> </span>d1
+    
+    d1<span class="op">$</span>x<span class="op">$</span>css =<span class="st"> &quot;</span>
+<span class="st"> .dygraph-legend &gt; span {display:none;}</span>
+<span class="st"> .dygraph-legend &gt; span.highlight { display: inline; }</span>
+<span class="st"> &quot;</span>
+    d1
+  })
+  
+  output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+    map &lt;-<span class="st"> </span><span class="kw">map</span>()
+    data &lt;-<span class="st"> </span><span class="kw">data</span>()
+    
+    <span class="co"># Add data to map</span>
+    datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>input<span class="op">$</span>yearselected), ]
+    ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+    map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]
+    
+    <span class="co"># Create variableplot</span>
+    map<span class="op">$</span>variableplot &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(map<span class="op">@</span>data[, input<span class="op">$</span>variableselected])
+    
+    <span class="co"># Create leaflet</span>
+    pal &lt;-<span class="st"> </span><span class="kw">colorBin</span>(<span class="st">&quot;YlOrRd&quot;</span>, <span class="dt">domain =</span> map<span class="op">$</span>variableplot, <span class="dt">bins =</span> <span class="dv">7</span>)
+    
+    labels &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;%s: %g&quot;</span>, map<span class="op">$</span>county, map<span class="op">$</span>variableplot) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(htmltools<span class="op">::</span>HTML)
+    
+    l &lt;-<span class="st"> </span><span class="kw">leaflet</span>(map) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addTiles</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addPolygons</span>(
+      <span class="dt">fillColor =</span> <span class="op">~</span><span class="kw">pal</span>(variableplot),
+      <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>,
+      <span class="dt">dashArray =</span> <span class="st">&quot;3&quot;</span>,
+      <span class="dt">fillOpacity =</span> <span class="fl">0.7</span>,
+      <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
+<span class="st">      </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>variableplot, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>)
+  })
+}
+
+<span class="co"># shinyApp()</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p><img src="appdir/app4.png" width="100%" /></p>
+</div>
+<div id="section-handle-missing-inputs" class="section level1">
+<h1><span class="header-section-number">14</span> Handle missing inputs</h1>
+<div id="section-require-input-files-to-be-available-using-req" class="section level2">
+<h2><span class="header-section-number">14.1</span> Require input files to be available using <code>req()</code></h2>
+<p>We note that until the user upload the files the outputs render error messages. Here we add code that makes the output not to be shown until the data is uploaded. We do this by using inside the reactive expression the function <code>req(input$inputId)</code> that means require <code>input$inputId</code> to be available. <code>req()</code> evaluates its arguments one at a time and if these are missing it stops. In this way, the value returned by the reactive expression will not be updated, and outputs that use the value returned by the reactive expression will not be re-executed. Details on how to use <code>req()</code> are in <a href="https://shiny.rstudio.com/articles/req.html" class="uri">https://shiny.rstudio.com/articles/req.html</a>.</p>
+<p>We add <code>req(input$filedata)</code> at the beginning of the reactive expression that reads the data. If the data has not been uploaded yet, <code>input$filedata</code> is equal to <code>&quot;&quot;</code>. This makes the execution of the reactive expression stop, <code>data()</code> is not updated, and the output depending on <code>data()</code> is not executed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui. First line in the reactive() that reads the data</span>
+<span class="kw">req</span>(input<span class="op">$</span>filedata)</code></pre></div>
+<p>Similarly, we add <code>req(input$filemap)</code> at the beginning of the reactive expression that reads the map. If the map has not been uploaded yet, <code>input$filemap</code> is missing, the execution of the reactive expression stops, <code>map()</code> is not updated, and the output depending on <code>map()</code> is not executed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># in ui. First line in the reactive() that reads the map</span>
+<span class="kw">req</span>(input<span class="op">$</span>filemap)</code></pre></div>
+</div>
+<div id="section-check-both-the-data-and-the-shapefile-are-uploaded-before-plotting-the-leaflet-map" class="section level2">
+<h2><span class="header-section-number">14.2</span> Check both the data and the shapefile are uploaded before plotting the leaflet map</h2>
+<p>Before constructing the leaflet map, the data has to be added to the shapefile. To do this we need to make sure that both the data and the map are uploaded. We can do this by writing at the beginning of <code>renderLeaflet()</code> the following code.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+  <span class="cf">if</span>(<span class="kw">is.null</span>(<span class="kw">data</span>()) <span class="op">|</span><span class="st"> </span><span class="kw">is.null</span>(<span class="kw">map</span>())){
+    <span class="kw">return</span>(<span class="ot">NULL</span>)
+  }
+  ...   
+})    </code></pre></div>
+<p>When either <code>data()</code> or <code>map()</code> are updated, the instructions of <code>renderLeaflet()</code> are executed. Then, at the beginning of <code>renderLeaflet()</code> it is checked whether either <code>data()</code> or <code>map()</code> are <code>NULL</code>. If this is TRUE, the execution stops returning <code>NULL</code>. This avoids the error that we would get when trying to add the data to the map when either of these two elements are <code>NULL</code>.</p>
+</div>
+</div>
+<div id="section-content-of-app.r-4" class="section level1">
+<h1><span class="header-section-number">15</span> Content of <code>app.R</code></h1>
+<p>The complete code of <code>app.R</code> is given below.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+<span class="kw">library</span>(rgdal)
+<span class="kw">library</span>(DT)
+<span class="kw">library</span>(dygraphs)
+<span class="kw">library</span>(xts)
+<span class="kw">library</span>(leaflet)
+
+<span class="co"># ui object</span>
+ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
+  <span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),
+  <span class="kw">sidebarLayout</span>(
+    <span class="kw">sidebarPanel</span>(
+      <span class="kw">fileInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;filedata&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Upload data. Choose csv file&quot;</span>,
+                <span class="dt">accept =</span> <span class="kw">c</span>(<span class="st">&quot;.csv&quot;</span>)),
+      <span class="kw">fileInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;filemap&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Upload map. Choose shapefile&quot;</span>,
+                <span class="dt">multiple =</span> <span class="ot">TRUE</span>, <span class="dt">accept=</span><span class="kw">c</span>(<span class="st">&#39;.shp&#39;</span>,<span class="st">&#39;.dbf&#39;</span>,<span class="st">&#39;.sbn&#39;</span>,<span class="st">&#39;.sbx&#39;</span>,<span class="st">&#39;.shx&#39;</span>,<span class="st">&#39;.prj&#39;</span>)),
+      <span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;variableselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select variable&quot;</span>,
+                  <span class="dt">choices =</span> <span class="kw">c</span>(<span class="st">&quot;cases&quot;</span>, <span class="st">&quot;population&quot;</span>)),
+      <span class="kw">selectInput</span>(<span class="dt">inputId =</span> <span class="st">&quot;yearselected&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;Select year&quot;</span>,
+                  <span class="dt">choices =</span> <span class="dv">1968</span><span class="op">:</span><span class="dv">1988</span>),
+      <span class="kw">p</span>(<span class="st">&quot;Made with&quot;</span>, <span class="kw">a</span>(<span class="st">&quot;Shiny&quot;</span>, <span class="dt">href =</span> <span class="st">&quot;http://shiny.rstudio.com&quot;</span>), <span class="st">&quot;.&quot;</span>),
+      <span class="kw">img</span>(<span class="dt">src =</span> <span class="st">&quot;imageShiny.png&quot;</span>, <span class="dt">width =</span> <span class="st">&quot;70px&quot;</span>, <span class="dt">height =</span> <span class="st">&quot;70px&quot;</span>)
+    ),
+    
+    <span class="kw">mainPanel</span>(
+      <span class="kw">leafletOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;map&quot;</span>),
+      <span class="kw">dygraphOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;timetrend&quot;</span>),
+      <span class="kw">DTOutput</span>(<span class="dt">outputId =</span> <span class="st">&quot;table&quot;</span>)
+    )
+  )
+)
+
+<span class="co"># server()</span>
+server &lt;-<span class="st"> </span><span class="cf">function</span>(input, output){
+  data &lt;-<span class="st"> </span><span class="kw">reactive</span>({
+    <span class="kw">req</span>(input<span class="op">$</span>filedata)
+    <span class="kw">read.csv</span>(input<span class="op">$</span>filedata<span class="op">$</span>datapath)})
+  
+  map &lt;-<span class="st"> </span><span class="kw">reactive</span>({
+    <span class="kw">req</span>(input<span class="op">$</span>filemap)
+    
+    <span class="co"># shpdf is a data.frame with the name, size, type and datapath of the uploaded files</span>
+    shpdf &lt;-<span class="st"> </span>input<span class="op">$</span>filemap
+    
+    <span class="co"># The files are uploaded with names 0.dbf, 1.prj, 2.shp, 3.xml, 4.shx</span>
+    <span class="co"># (path/names are in column datapath)</span>
+    <span class="co"># We need to rename the files with the actual names: fe_2007_39_county.dbf, etc.</span>
+    <span class="co"># (these are in column name)</span>
+    
+    <span class="co"># Name of the temporary directory where files are uploaded</span>
+    tempdirname &lt;-<span class="st"> </span><span class="kw">dirname</span>(shpdf<span class="op">$</span>datapath[<span class="dv">1</span>])
+    
+    <span class="co"># Rename files</span>
+    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(shpdf)){
+      <span class="kw">file.rename</span>(shpdf<span class="op">$</span>datapath[i], <span class="kw">paste0</span>(tempdirname, <span class="st">&quot;/&quot;</span>, shpdf<span class="op">$</span>name[i]))
+    }
+    
+    <span class="co"># Now we read the shapefile with readOGR() of rgdal package</span>
+    <span class="co"># passing the name of the file with .shp extension.</span>
+    
+    <span class="co"># We use the function grep() to search the pattern &quot;*.shp$&quot;</span>
+    <span class="co"># within each element of the character vector shpdf$name.</span>
+    <span class="co"># grep(pattern=&quot;*.shp$&quot;, shpdf$name)</span>
+    <span class="co"># ($ at the end denote files that finish with .shp, not only that contain .shp)</span>
+    map &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="kw">paste</span>(tempdirname, shpdf<span class="op">$</span>name[<span class="kw">grep</span>(<span class="dt">pattern =</span> <span class="st">&quot;*.shp$&quot;</span>, shpdf<span class="op">$</span>name)], <span class="dt">sep=</span><span class="st">&quot;/&quot;</span>))
+    map
+  })
+  
+  output<span class="op">$</span>table &lt;-<span class="st"> </span><span class="kw">renderDT</span>(<span class="kw">data</span>())
+  
+  output<span class="op">$</span>timetrend &lt;-<span class="st"> </span><span class="kw">renderDygraph</span>({
+    data &lt;-<span class="st"> </span><span class="kw">data</span>()
+    dataxts &lt;-<span class="st"> </span><span class="ot">NULL</span>
+    counties &lt;-<span class="st"> </span><span class="kw">unique</span>(data<span class="op">$</span>county)
+    <span class="cf">for</span>(l <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(counties)){
+      datacounty &lt;-<span class="st"> </span>data[data<span class="op">$</span>county <span class="op">==</span><span class="st"> </span>counties[l],]
+      dd &lt;-<span class="st"> </span><span class="kw">xts</span>(datacounty[, input<span class="op">$</span>variableselected], <span class="kw">as.Date</span>(<span class="kw">paste0</span>(datacounty<span class="op">$</span>year,<span class="st">&quot;-01-01&quot;</span>)))
+      dataxts &lt;-<span class="st"> </span><span class="kw">cbind</span>(dataxts, dd)
+    }
+    <span class="kw">colnames</span>(dataxts) &lt;-<span class="st"> </span>counties
+    <span class="kw">dygraph</span>(dataxts) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">dyHighlight</span>(<span class="dt">highlightSeriesBackgroundAlpha =</span> <span class="fl">0.2</span>)-&gt;<span class="st"> </span>d1
+    d1<span class="op">$</span>x<span class="op">$</span>css =<span class="st"> &quot;</span>
+<span class="st"> .dygraph-legend &gt; span {display:none;}</span>
+<span class="st"> .dygraph-legend &gt; span.highlight { display: inline; }</span>
+<span class="st"> &quot;</span>
+    d1
+  })
+  
+  output<span class="op">$</span>map &lt;-<span class="st"> </span><span class="kw">renderLeaflet</span>({
+    <span class="cf">if</span>(<span class="kw">is.null</span>(<span class="kw">data</span>()) <span class="op">|</span><span class="st"> </span><span class="kw">is.null</span>(<span class="kw">map</span>())){
+      <span class="kw">return</span>(<span class="ot">NULL</span>)
+    }
+    
+    map &lt;-<span class="st"> </span><span class="kw">map</span>()
+    data &lt;-<span class="st"> </span><span class="kw">data</span>()
+    
+    <span class="co"># Add data to map</span>
+    datafiltered &lt;-<span class="st"> </span>data[<span class="kw">which</span>(data<span class="op">$</span>year <span class="op">==</span><span class="st"> </span>input<span class="op">$</span>yearselected), ]
+    ordercounties &lt;-<span class="st"> </span><span class="kw">match</span>(map<span class="op">@</span>data<span class="op">$</span>NAME, datafiltered<span class="op">$</span>county)
+    map<span class="op">@</span>data &lt;-<span class="st"> </span>datafiltered[ordercounties, ]
+    
+    <span class="co"># Create variableplot</span>
+    map<span class="op">$</span>variableplot &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(map<span class="op">@</span>data[, input<span class="op">$</span>variableselected])
+    
+    <span class="co"># Create leaflet</span>
+    pal &lt;-<span class="st"> </span><span class="kw">colorBin</span>(<span class="st">&quot;YlOrRd&quot;</span>, <span class="dt">domain =</span> map<span class="op">$</span>variableplot, <span class="dt">bins =</span> <span class="dv">7</span>)
+    labels &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;%s: %g&quot;</span>, map<span class="op">$</span>county, map<span class="op">$</span>variableplot) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">lapply</span>(htmltools<span class="op">::</span>HTML)
+    
+    l &lt;-<span class="st"> </span><span class="kw">leaflet</span>(map) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addTiles</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">addPolygons</span>(
+      <span class="dt">fillColor =</span> <span class="op">~</span><span class="kw">pal</span>(variableplot),
+      <span class="dt">color =</span> <span class="st">&quot;white&quot;</span>,
+      <span class="dt">dashArray =</span> <span class="st">&quot;3&quot;</span>,
+      <span class="dt">fillOpacity =</span> <span class="fl">0.7</span>,
+      <span class="dt">label =</span> labels) <span class="op">%&gt;%</span>
+<span class="st">      </span>leaflet<span class="op">::</span><span class="kw">addLegend</span>(<span class="dt">pal =</span> pal, <span class="dt">values =</span> <span class="op">~</span>variableplot, <span class="dt">opacity =</span> <span class="fl">0.7</span>, <span class="dt">title =</span> <span class="ot">NULL</span>)
+  })
+}
+
+<span class="co"># shinyApp()</span>
+<span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
+<p><img src="appdir/appfinalcaptura.png" width="100%" /></p>
+</div>
+<div id="section-conclusion" class="section level1">
+<h1><span class="header-section-number">16</span> Conclusion</h1>
+<p>In this tutorial we have shown how to build a Shiny app to visualize spatial and spatio-temporal data. We have seen how to include interactive visualizations: a <code>DT</code> table, a <code>leaflet</code> map and a <code>dygraphs</code> time series plot. We have also shown how to upload specific files and how to add functionality that enable the user to select specific information to be shown. We can also improve the appearance and functionality of the app by modifying the layout and adding different inputs and outputs with new functionality. Section References contains links to tutorials and R packages that can be used to improve the app.</p>
+</div>
+<div id="section-references" class="section level1">
+<h1><span class="header-section-number">17</span> References</h1>
+<ul>
+<li>RStudio <code>Shiny</code> tutorial <a href="https://shiny.rstudio.com/tutorial/written-tutorial/lesson1/" class="uri">https://shiny.rstudio.com/tutorial/written-tutorial/lesson1/</a></li>
+<li><code>Shiny</code> <a href="https://shiny.rstudio.com/" class="uri">https://shiny.rstudio.com/</a>.</li>
+<li><code>DT</code> <a href="https://rstudio.github.io/DT/" class="uri">https://rstudio.github.io/DT/</a></li>
+<li><code>dygraphs</code> <a href="https://rstudio.github.io/dygraphs/" class="uri">https://rstudio.github.io/dygraphs/</a></li>
+<li><code>leaflet</code> <a href="https://rstudio.github.io/leaflet/" class="uri">https://rstudio.github.io/leaflet/</a></li>
+<li><code>SpatialEpiApp</code> <a href="https://paula-moraga.github.io/software/" class="uri">https://paula-moraga.github.io/software/</a></li>
+</ul>
+<hr/>
+<p style="text-align: center;">
+Paula Moraga
+</p>
+<p style="text-align: center;">
+<a href="https://paula-moraga.github.io/" target="_blank"><i class='fa fa-2x fa-globe'></i></a> <a href="https://twitter.com/_PaulaMoraga_" target="_blank"><i class='fa fa-2x fa-twitter'></i></a> <a href="https://github.com/Paula-Moraga" target="_blank"><i class='fa fa-2x fa-github'></i></a>
+</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
