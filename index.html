@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2018-04-23" />
+<meta name="date" content="2018-05-31" />
 
 <title>Building a Shiny web application to visualize spatial and spatio-temporal data</title>
 
@@ -271,14 +271,13 @@ div.tocify {
 Paula Moraga
 </h3>
 <p></a> CHICAS, Lancaster University, UK</p></em></h4>
-<h4 class="date"><em>23 April 2018</em></h4>
+<h4 class="date"><em>31 May 2018</em></h4>
 
 </div>
 
 
 <p>In this tutorial we develop a Shiny web application to visualize spatial and spatio-temporal data. Specifically, the app shows the number of disease cases and the population in a given region using interactive maps, tables, and time series plots. The app allows the user to upload a csv file with the data and a shapefile with the map of the region. The app also permits selecting the variable and the time to be shown.</p>
 <p>We develop the app using the R package <a href="https://shiny.rstudio.com/"><code>Shiny</code></a>. The interactive data visualizations are built using the packages <a href="https://rstudio.github.io/DT/"><code>DT</code></a>, <a href="https://rstudio.github.io/dygraphs/"><code>dygraphs</code></a>, and <a href="https://rstudio.github.io/leaflet/"><code>leaflet</code></a>. The example we use refers to data of the number of lung cancer cases and population in the 88 counties of Ohio, United States, during years 1968 to 1988. These data are in the package <a href="https://paula-moraga.github.io/software/"><code>SpatialEpiApp</code></a> and can also be downloaded from <a href="https://paula-moraga.github.io/teaching/">here</a>.</p>
-<p><img src="appdir/appfinalcaptura.png" width="100%" /></p>
 <div id="section-shiny" class="section level1">
 <h1><span class="header-section-number">1</span> Shiny</h1>
 <p><a href="https://shiny.rstudio.com/"><code>Shiny</code></a> is a web application framework for R that enables to build interactive web applications. A Shiny app is a directory that contains an R file called <code>app.R</code> with three components:</p>
@@ -376,9 +375,9 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 <div id="section-content-of-app.r" class="section level1">
 <h1><span class="header-section-number">6</span> Content of <code>app.R</code></h1>
 <p>This is the content of <code>app.R</code> we have until now.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)</code></pre></div>
-<pre><code>## Warning: package &#39;shiny&#39; was built under R version 3.4.4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ui object</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shiny)
+
+<span class="co"># ui object</span>
 ui &lt;-<span class="st"> </span><span class="kw">fluidPage</span>(
   <span class="kw">titlePanel</span>(<span class="kw">p</span>(<span class="st">&quot;Spatial app&quot;</span>, <span class="dt">style =</span> <span class="st">&quot;color:#3474A7&quot;</span>)),
   <span class="kw">sidebarLayout</span>(
@@ -394,7 +393,6 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 
 <span class="co"># shinyApp()</span>
 <span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
-<p><img src="appdir/app1.png" width="100%" /></p>
 </div>
 <div id="section-read-data" class="section level1">
 <h1><span class="header-section-number">7</span> Read data</h1>
@@ -593,7 +591,6 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 
 <span class="co"># shinyApp()</span>
 <span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
-<p><img src="appdir/app2.png" width="100%" /></p>
 </div>
 <div id="section-add-reactivity" class="section level1">
 <h1><span class="header-section-number">10</span> Add reactivity</h1>
@@ -739,7 +736,6 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 
 <span class="co"># shinyApp()</span>
 <span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
-<p><img src="appdir/app3.png" width="100%" /></p>
 </div>
 <div id="section-upload-data" class="section level1">
 <h1><span class="header-section-number">12</span> Upload data</h1>
@@ -939,7 +935,6 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 
 <span class="co"># shinyApp()</span>
 <span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
-<p><img src="appdir/app4.png" width="100%" /></p>
 </div>
 <div id="section-handle-missing-inputs" class="section level1">
 <h1><span class="header-section-number">14</span> Handle missing inputs</h1>
@@ -1088,7 +1083,6 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 
 <span class="co"># shinyApp()</span>
 <span class="kw">shinyApp</span>(<span class="dt">ui =</span> ui, <span class="dt">server =</span> server)</code></pre></div>
-<p><img src="appdir/appfinalcaptura.png" width="100%" /></p>
 </div>
 <div id="section-conclusion" class="section level1">
 <h1><span class="header-section-number">16</span> Conclusion</h1>
@@ -1104,13 +1098,18 @@ server &lt;-<span class="st"> </span><span class="cf">function</span>(input, out
 <li><code>leaflet</code> <a href="https://rstudio.github.io/leaflet/" class="uri">https://rstudio.github.io/leaflet/</a></li>
 <li><code>SpatialEpiApp</code> <a href="https://paula-moraga.github.io/software/" class="uri">https://paula-moraga.github.io/software/</a></li>
 </ul>
+<p><br><br />
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by <a rel="author" href="https://paula-moraga.github.io/">Paula Moraga</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</p>
+<!--
+
 <hr/>
+<p style="text-align: center;"> Paula Moraga </p>
 <p style="text-align: center;">
-Paula Moraga
+<a href="https://paula-moraga.github.io/" target="_blank"><i class='fa fa-2x fa-globe'></i></a>
+<a href="https://twitter.com/_PaulaMoraga_" target="_blank"><i class='fa fa-2x fa-twitter'></i></a>
+<a href="https://github.com/Paula-Moraga" target="_blank"><i class='fa fa-2x fa-github'></i></a>
 </p>
-<p style="text-align: center;">
-<a href="https://paula-moraga.github.io/" target="_blank"><i class='fa fa-2x fa-globe'></i></a> <a href="https://twitter.com/_PaulaMoraga_" target="_blank"><i class='fa fa-2x fa-twitter'></i></a> <a href="https://github.com/Paula-Moraga" target="_blank"><i class='fa fa-2x fa-github'></i></a>
-</p>
+-->
 </div>
 
 

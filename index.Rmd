@@ -1,7 +1,7 @@
 ---
 title: "Building a Shiny web application to visualize spatial and spatio-temporal data"
 author: <a href="https://paula-moraga.github.io/"> <h3> Paula Moraga </h3> </a> \newline CHICAS, Lancaster University, UK
-date: 23 April 2018
+date: 31 May 2018
 runtime: shiny
 output:
   bookdown::html_document2:
@@ -21,6 +21,7 @@ output:
   
 ```{r setup, include=FALSE}
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+knitr::opts_chunk$set(eval = FALSE, cache = FALSE, warning = FALSE, message = FALSE)
 ```       
 
      
@@ -746,6 +747,12 @@ Section References contains links to tutorials and R packages that can be used t
 - `SpatialEpiApp` https://paula-moraga.github.io/software/
 
 
+
+<br>       
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work by <a rel="author" href="https://paula-moraga.github.io/">Paula Moraga</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+
+<!--
+
 <hr/>
 <p style="text-align: center;"> Paula Moraga </p>
 <p style="text-align: center;">
@@ -753,4 +760,5 @@ Section References contains links to tutorials and R packages that can be used t
 <a href="https://twitter.com/_PaulaMoraga_" target="_blank"><i class='fa fa-2x fa-twitter'></i></a>
 <a href="https://github.com/Paula-Moraga" target="_blank"><i class='fa fa-2x fa-github'></i></a>
 </p>
+-->
        
