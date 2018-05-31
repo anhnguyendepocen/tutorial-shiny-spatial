@@ -21,7 +21,7 @@ output:
   
 ```{r setup, include=FALSE}
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
-knitr::opts_chunk$set(eval = FALSE, cache = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(eval = TRUE, cache = FALSE, warning = FALSE, message = FALSE)
 ```       
 
      
